@@ -15,9 +15,9 @@ import java.sql.Timestamp;
 public class Reservation {
 
     private Long reservationId;
-    private Long user_id;
-    private Long floor_id;
-    private Long table_id;
+    private Long userId;
+    private Long floorId;
+    private Long deskId;
     private Timestamp reservationStart;
     private Timestamp reservationEnd;
 }

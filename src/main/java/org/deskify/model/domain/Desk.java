@@ -13,5 +13,6 @@ public class Desk {
 
     private Long deskId;
     private String deskName;
+    private DeskStatus deskStatus;
     private Long roomId;
 }
