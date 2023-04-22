@@ -16,6 +16,7 @@ CREATE TABLE desks
 (
     desk_id   BIGINT PRIMARY KEY,
     desk_name VARCHAR(255) NOT NULL,
+    status    ENUM('FREE', 'RESERVED', 'UNAVAILABLE') NOT NULL,
     room_id   BIGINT       NOT NULL,
     FOREIGN KEY (room_id) REFERENCES rooms (room_id)
 );
@@ -56,12 +57,12 @@ VALUES (1, 'Room 1', 1),
        (4, 'Room 1', 3),
        (5, 'Room 2', 3);
 
-INSERT INTO desks (desk_id, desk_name, room_id)
-VALUES (1, 'Desk 1', 1),
-       (2, 'Desk 2', 1),
-       (3, 'Desk 3', 2),
-       (4, 'Desk 4', 3),
-       (5, 'Desk 5', 3);
+INSERT INTO desks (desk_id, desk_name, status, room_id)
+VALUES (1, 'Desk 1', 'FREE', 1),
+       (2, 'Desk 2', 'RESERVED', 1),
+       (3, 'Desk 3', 'RESERVED', 2),
+       (4, 'Desk 4', 'FREE', 3),
+       (5, 'Desk 5', 'FREE', 3);
 
 INSERT INTO users (user_id, username, password, first_name, account_type, last_name, email)
 VALUES (1, 'john_doe', 'password123', 'John', 'USER', 'Doe', 'john.doe@example.com'),
