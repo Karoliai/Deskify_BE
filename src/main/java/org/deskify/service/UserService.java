@@ -5,6 +5,7 @@ import org.deskify.model.domain.AccountType;
 import org.deskify.model.domain.User;
 import org.deskify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,18 +23,18 @@ public class UserService {
 
     public User createUser(CreateUserRequest request) {
         User user = User.builder()
-                        .username(request.getUsername())
-                        .password(request.getPassword())
-                        .firstName(request.getFirstName())
-                        .lastName(request.getLastName())
-                        .accountType(AccountType.USER)
-                        .email(request.getEmail())
-                        .build();
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .accountType(AccountType.USER)
+                .email(request.getEmail())
+                .build();
 
         if (!validateUser(user)) {
             throw new IllegalArgumentException("Username or email is already taken");
         }
-        if (!isValidEmail(request.getEmail())){
+        if (!isValidEmail(request.getEmail())) {
             throw new IllegalArgumentException("Incorrect email");
         }
 
@@ -41,8 +42,8 @@ public class UserService {
     }
 
     public boolean validateUser(User user) {
-        if (!fetchUsers(null, user.getUsername(), null,null,null).isEmpty()) return false;
-        return fetchUsers(null, null,null,null, user.getEmail()).isEmpty();
+        if (!fetchUsers(null, user.getUsername(), null, null, null).isEmpty()) return false;
+        return fetchUsers(null, null, null, null, user.getEmail()).isEmpty();
     }
 
     public List<User> fetchUsers(Long id, String username, String firstName, String lastName, String email) {
@@ -90,5 +91,9 @@ public class UserService {
     public void deleteUserByUsername(Long id) {
         User user = userRepository.findUserById(id);
         userRepository.deleteById(user.getId());
+    }
+
+    public UserDetails loadUserByUsername(String email) {
+        return null;
     }
 }

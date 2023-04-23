@@ -3,15 +3,21 @@ import org.deskify.model.domain.AccountType;
 import org.deskify.model.domain.User;
 import org.deskify.repository.UserRepository;
 import org.deskify.service.UserService;
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -104,14 +110,14 @@ class UserServiceTest {
 
     @Test
     void fetchUsersShouldReturnAllUsers() {
-        User user1 = new User(2L, "jane_smith", "password123", "Jane", AccountType.ADMIN,"Smith" ,"jane.smith@example.com");
-        User user2 = new User(3L, "bob_johnson", "password123", "Bob", AccountType.USER, "Johnson","bob.johnson@example.com");
+        User user1 = new User(2L, "jane_smith", "password123", "Jane", AccountType.ADMIN, "Smith", "jane.smith@example.com");
+        User user2 = new User(3L, "bob_johnson", "password123", "Bob", AccountType.USER, "Johnson", "bob.johnson@example.com");
 
         expectedUsers.add(user1);
         expectedUsers.add(user2);
         when(userRepository.findAll()).thenReturn(expectedUsers);
 
-        List<User> result = userService.fetchUsers(null, null, null,  null, null);
+        List<User> result = userService.fetchUsers(null, null, null, null, null);
         assertEquals(expectedUsers.size(), result.size());
         assertEquals(expectedUsers.get(0).getId(), result.get(0).getId());
         assertEquals(expectedUsers.get(1).getId(), result.get(1).getId());
@@ -124,7 +130,7 @@ class UserServiceTest {
 
         when(userRepository.findAllByFirstName(firstName)).thenReturn(expectedUsers);
 
-        List<User> actualUsers = userService.fetchUsers(null, null,firstName, null, null);
+        List<User> actualUsers = userService.fetchUsers(null, null, firstName, null, null);
 
         assertEquals(expectedUsers, actualUsers);
     }
@@ -136,10 +142,11 @@ class UserServiceTest {
 
         when(userRepository.findAllByLastName(lastName)).thenReturn(expectedUsers);
 
-        List<User> actualUsers = userService.fetchUsers(null, null,null, lastName, null);
+        List<User> actualUsers = userService.fetchUsers(null, null, null, lastName, null);
 
         assertEquals(expectedUsers, actualUsers);
     }
+
     @Test
     void fetchUsersByNonExistantLastNameShouldReturnNull() {
         String lastName = "Marston";
@@ -147,7 +154,7 @@ class UserServiceTest {
 
         when(userRepository.findAllByLastName(lastName)).thenReturn(expectedUsers);
 
-        List<User> actualUsers = userService.fetchUsers(null, null,null, lastName, null);
+        List<User> actualUsers = userService.fetchUsers(null, null, null, lastName, null);
 
         assertEquals(expectedUsers, actualUsers);
     }
@@ -159,7 +166,7 @@ class UserServiceTest {
 
         when(userRepository.findAllByEmail(email)).thenReturn(expectedUsers);
 
-        List<User> actualUsers = userService.fetchUsers(null, null, null, null,  email);
+        List<User> actualUsers = userService.fetchUsers(null, null, null, null, email);
 
         assertEquals(expectedUsers, actualUsers);
     }
@@ -171,7 +178,7 @@ class UserServiceTest {
 
         when(userRepository.findAllById(id)).thenReturn(expectedUsers);
 
-        List<User> actualUsers = userService.fetchUsers(id, null, null,null, null);
+        List<User> actualUsers = userService.fetchUsers(id, null, null, null, null);
 
         assertEquals(expectedUsers, actualUsers);
     }
@@ -183,7 +190,7 @@ class UserServiceTest {
 
         when(userRepository.findAllById(id)).thenReturn(expectedUsers);
 
-        List<User> actualUsers = userService.fetchUsers(id, null, null,null, null);
+        List<User> actualUsers = userService.fetchUsers(id, null, null, null, null);
 
         assertEquals(expectedUsers, actualUsers);
     }
@@ -240,9 +247,34 @@ class UserServiceTest {
         assertEquals(newAccountType, user.getAccountType());
         assertEquals(newEmail, user.getEmail());
 
+
         verify(userRepository, times(1)).save(user);
     }
 
+    @Test
+    void loadUserByUsernameShouldReturnValidUser() {
 
+        String email = "john.doe@example.com";
+        User user = User.builder().email(email).password("password").build();
+        Mockito.when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+
+        UserDetails userDetails = userService.loadUserByUsername(email);
+        assertEquals(user.getEmail(), userDetails.getUsername());
+        assertEquals(user.getPassword(), userDetails.getPassword());
+        Assertions.assertTrue(userDetails.getAuthorities().isEmpty());
+
+    }
+
+    @Test()
+    void validateUserShouldReturnEmptyUser() {
+        String email = "test@test.com";
+        User user = User.builder().email(email).password("password123").build();
+        Mockito.when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
+        Exception exception = assertThrows(UsernameNotFoundException.class, () -> {
+            userService.loadUserByUsername(email);
+        });
+        assertEquals("User not found with Email: " + email, exception.getMessage());
+
+    }
 
 }
