@@ -3,6 +3,7 @@ package org.deskify.repository;
 import org.deskify.model.domain.dtoUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,5 +15,5 @@ public interface UserRepository extends JpaRepository<dtoUser, Long> {
     List<dtoUser> findAllByLastName(String lastName);
     List<dtoUser> findAllByUsername(String username);
     dtoUser findUserById(Long id);
-    Optional<dtoUser> findUserByEmail(String email);
+    Optional<dtoUser> findUserByUsernameAndPassword(String username, String password);
 }

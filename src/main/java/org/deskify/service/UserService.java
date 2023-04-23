@@ -1,15 +1,14 @@
 package org.deskify.service;
 
 import org.deskify.model.api.request.CreateUserRequest;
+import org.deskify.model.api.request.LoginRequest;
+import org.deskify.model.api.response.LoginResponse;
 import org.deskify.model.domain.AccountType;
 import org.deskify.model.domain.dtoUser;
 import org.deskify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -96,13 +95,17 @@ public class UserService {
         userRepository.deleteById(user.getId());
     }
 
-    public UserDetails loadUserByUsername(String email) {
-        Optional<dtoUser> user = userRepository.findUserByEmail(email);
+    public Optional<dtoUser> loadUserByUsernameAndPassword(String username, String password) {
+        Optional<dtoUser> user = userRepository.findUserByUsernameAndPassword(username, password);
         if (user.isPresent()) {
-            return new User(user.get().getEmail(),user.get().getPassword(),
-                    new ArrayList<>());
+            return user;
         } else {
-            throw new UsernameNotFoundException("User not found with Email: " + email);
+            throw new RuntimeException("User not found with Username: " + username);
         }
+    }
+
+    public LoginResponse validateLogin(LoginRequest request) {
+         Optional<dtoUser> user = loadUserByUsernameAndPassword(request.getUsername(),request.getPassword());
+         return new LoginResponse(user.get().getId(), user.get().getUsername());
     }
 }
