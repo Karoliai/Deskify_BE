@@ -30,6 +30,7 @@ public class UserController {
         return userService.createUser(request).getId();
     }
 
+
     @GetMapping(value = "/fetch")
     @Operation(summary = "Get users from database")
     public List<UserResponse> fetchUsers(@RequestParam(required = false) Long id,

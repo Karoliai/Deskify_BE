@@ -2,13 +2,16 @@ package org.deskify.service;
 
 import org.deskify.model.api.request.CreateUserRequest;
 import org.deskify.model.domain.AccountType;
-import org.deskify.model.domain.User;
+import org.deskify.model.domain.dtoUser;
 import org.deskify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.deskify.utils.Validator.isValidEmail;
 
@@ -21,8 +24,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(CreateUserRequest request) {
-        User user = User.builder()
+    public dtoUser createUser(CreateUserRequest request) {
+        dtoUser user = dtoUser.builder()
                 .username(request.getUsername())
                 .password(request.getPassword())
                 .firstName(request.getFirstName())
@@ -41,12 +44,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean validateUser(User user) {
+    public boolean validateUser(dtoUser user) {
         if (!fetchUsers(null, user.getUsername(), null, null, null).isEmpty()) return false;
         return fetchUsers(null, null, null, null, user.getEmail()).isEmpty();
     }
 
-    public List<User> fetchUsers(Long id, String username, String firstName, String lastName, String email) {
+    public List<dtoUser> fetchUsers(Long id, String username, String firstName, String lastName, String email) {
         return (id != null) ? this.userRepository.findAllById(id)
                 : (username != null) ? this.userRepository.findAllByUsername(username)
                 : (firstName != null) ? this.userRepository.findAllByFirstName(firstName)
@@ -56,7 +59,7 @@ public class UserService {
     }
 
     public void updateUserInformation(Long id, String newUsername, String newPassword, String newFirstName, String newLastName, AccountType newAccountType, String newEmail) {
-        User user = userRepository.findUserById(id);
+        dtoUser user = userRepository.findUserById(id);
         boolean userUpdated = false;
 
         if (newUsername != null) {
@@ -89,11 +92,17 @@ public class UserService {
     }
 
     public void deleteUserByUsername(Long id) {
-        User user = userRepository.findUserById(id);
+        dtoUser user = userRepository.findUserById(id);
         userRepository.deleteById(user.getId());
     }
 
     public UserDetails loadUserByUsername(String email) {
-        return null;
+        Optional<dtoUser> user = userRepository.findUserByEmail(email);
+        if (user.isPresent()) {
+            return new User(user.get().getEmail(),user.get().getPassword(),
+                    new ArrayList<>());
+        } else {
+            throw new UsernameNotFoundException("User not found with Email: " + email);
+        }
     }
 }
