@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static org.deskify.utils.Validator.isValidEmail;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -28,7 +30,19 @@ public class UserService {
                         .email(request.getEmail())
                         .build();
 
+        if (!validateUser(user)) {
+            throw new IllegalArgumentException("Username or email is already taken");
+        }
+        if (!isValidEmail(request.getEmail())){
+            throw new IllegalArgumentException("Incorrect email");
+        }
+
         return userRepository.save(user);
+    }
+
+    public boolean validateUser(User user) {
+        if (!fetchUsers(null, user.getUsername(), null,null,null).isEmpty()) return false;
+        return fetchUsers(null, null,null,null, user.getEmail()).isEmpty();
     }
 
     public List<User> fetchUsers(Long id, String username, String firstName, String lastName, String email) {
