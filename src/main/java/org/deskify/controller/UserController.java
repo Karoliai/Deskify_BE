@@ -2,10 +2,14 @@ package org.deskify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.deskify.model.api.request.CreateUserRequest;
+import org.deskify.model.api.response.LoginResponse;
 import org.deskify.model.api.response.UserResponse;
 import org.deskify.model.domain.AccountType;
+import org.deskify.model.api.request.LoginRequest;
 import org.deskify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +64,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUserUsername(@RequestParam Long id) {
         userService.deleteUserByUsername(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(path = "/login")
+    @Operation(summary = "Create new user in database")
+    public ResponseEntity<LoginResponse> loginUser(@Validated @RequestBody LoginRequest request) {
+        LoginResponse loginResponse = userService.validateLogin(request);
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
 }

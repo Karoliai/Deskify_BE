@@ -1,5 +1,3 @@
-CREATE SEQUENCE USER_ID_SEQ START WITH 4 INCREMENT BY 1;
-
 CREATE TABLE floors
 (
     floor_id   BIGINT PRIMARY KEY,
@@ -25,7 +23,7 @@ CREATE TABLE desks
 
 CREATE TABLE users
 (
-    user_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id      BIGINT PRIMARY KEY,
     username     VARCHAR(255) NOT NULL,
     password     VARCHAR(255) NOT NULL,
     first_name   VARCHAR(255) NOT NULL,
@@ -66,10 +64,10 @@ VALUES (1, 'Desk 1', 'FREE', 1),
        (4, 'Desk 4', 'FREE', 3),
        (5, 'Desk 5', 'FREE', 3);
 
-INSERT INTO users (username, password, first_name, account_type, last_name, email)
-VALUES ('john_doe', 'password123', 'John', 'USER', 'Doe', 'john.doe@example.com'),
-       ('jane_smith', 'password123', 'Jane', 'ADMIN', 'Smith', 'jane.smith@example.com'),
-       ('bob_johnson', 'password123', 'Bob', 'USER', 'Johnson', 'bob.johnson@example.com');
+INSERT INTO users (user_id, username, password, first_name, account_type, last_name, email)
+VALUES (1, 'john_doe', 'password123', 'John', 'USER', 'Doe', 'john.doe@example.com'),
+       (2, 'jane_smith', 'password123', 'Jane', 'ADMIN', 'Smith', 'jane.smith@example.com'),
+       (3, 'bob_johnson', 'password123', 'Bob', 'USER', 'Johnson', 'bob.johnson@example.com');
 
 INSERT INTO reservations (reservation_id, user_id, floor_id, desk_id, reservation_start, reservation_end)
 VALUES (1, 1, 1, 1, '2023-04-18 10:00:00', '2023-04-18 11:00:00'),

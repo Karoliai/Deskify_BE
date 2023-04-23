@@ -4,22 +4,18 @@ import org.deskify.model.domain.dtoUser;
 import org.deskify.repository.UserRepository;
 import org.deskify.service.UserService;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
@@ -253,26 +249,29 @@ class UserServiceTest {
     @Test
     void loadUserByUsernameShouldReturnValidUser() {
 
-        String email = "john.doe@example.com";
-        dtoUser user = dtoUser.builder().email(email).password("password").build();
-        Mockito.when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        String username = "john.doe@example.com";
+        String password = "password123";
+        dtoUser expectedUser = dtoUser.builder()
+                .username(username).id(1L).build();
+        Mockito.when(userRepository.findUserByUsernameAndPassword(username, password)).thenReturn(Optional.of(expectedUser));
 
-        UserDetails userDetails = userService.loadUserByUsername(email);
-        assertEquals(user.getEmail(), userDetails.getUsername());
-        assertEquals(user.getPassword(), userDetails.getPassword());
-        Assertions.assertTrue(userDetails.getAuthorities().isEmpty());
+        Optional<dtoUser> user = userService.loadUserByUsernameAndPassword(username, password);
+        assertTrue(user.isPresent());
+        assertEquals(user.get().getUsername(), expectedUser.getUsername());
+        assertEquals(user.get().getId(), expectedUser.getId());
 
     }
 
     @Test()
     void validateUserShouldReturnEmptyUser() {
-        String email = "test@test.com";
-        dtoUser user = dtoUser.builder().email(email).password("password123").build();
-        Mockito.when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
-        Exception exception = assertThrows(UsernameNotFoundException.class, () -> {
-            userService.loadUserByUsername(email);
+        String username = "john.fake@example.com";
+        String password = "fake13243";
+        dtoUser user = dtoUser.builder().username(username).id(999L).build();
+        Mockito.when(userRepository.findUserByUsernameAndPassword(username, password)).thenReturn(Optional.empty());
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            userService.loadUserByUsernameAndPassword(username, password);
         });
-        assertEquals("User not found with Email: " + email, exception.getMessage());
+        assertEquals("User not found with Username: " + username, exception.getMessage());
 
     }
 
