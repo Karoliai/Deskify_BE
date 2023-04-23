@@ -19,56 +19,58 @@ public class UserService {
     }
 
     public User createUser(CreateUserRequest request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setAccountType(AccountType.USER);
-        user.setEmail(request.getEmail());
+        User user = User.builder()
+                        .username(request.getUsername())
+                        .password(request.getPassword())
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .accountType(AccountType.USER)
+                        .email(request.getEmail())
+                        .build();
 
         return userRepository.save(user);
     }
 
-    public List<User> fetchUsers(Long id, String username, String firstName,  String lastName,  String email) {
-        if (id != null) {
-            return this.userRepository.findAllById(id);
-        } else if (username != null) {
-            return this.userRepository.findAllByUsername(username);
-        } else if (firstName != null) {
-            return this.userRepository.findAllByFirstName(firstName);
-        } else if (lastName != null) {
-            return this.userRepository.findAllByLastName(lastName);
-        } else if (email != null) {
-            return this.userRepository.findAllByEmail(email);
-        } else {
-            return this.userRepository.findAll();
-        }
+    public List<User> fetchUsers(Long id, String username, String firstName, String lastName, String email) {
+        return (id != null) ? this.userRepository.findAllById(id)
+                : (username != null) ? this.userRepository.findAllByUsername(username)
+                : (firstName != null) ? this.userRepository.findAllByFirstName(firstName)
+                : (lastName != null) ? this.userRepository.findAllByLastName(lastName)
+                : (email != null) ? this.userRepository.findAllByEmail(email)
+                : this.userRepository.findAll();
     }
 
     public void updateUserInformation(Long id, String newUsername, String newPassword, String newFirstName, String newLastName, AccountType newAccountType, String newEmail) {
         User user = userRepository.findUserById(id);
+        boolean userUpdated = false;
 
         if (newUsername != null) {
             user.setUsername(newUsername);
+            userUpdated = true;
         }
         if (newPassword != null) {
             user.setPassword(newPassword);
+            userUpdated = true;
         }
         if (newFirstName != null) {
             user.setFirstName(newFirstName);
+            userUpdated = true;
         }
         if (newLastName != null) {
             user.setLastName(newLastName);
+            userUpdated = true;
         }
         if (newAccountType != null) {
             user.setAccountType(newAccountType);
+            userUpdated = true;
         }
         if (newEmail != null) {
             user.setEmail(newEmail);
+            userUpdated = true;
         }
-
-        userRepository.save(user);
+        if (userUpdated) {
+            userRepository.save(user);
+        }
     }
 
     public void deleteUserByUsername(Long id) {

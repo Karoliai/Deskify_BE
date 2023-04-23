@@ -151,7 +151,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void testDeleteUser_ByUsername() {
+    public void testDeleteUser_ById() {
         Long id = 1L;
         User user = User.builder()
                 .id(id)
@@ -204,5 +204,7 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).save(user);
     }
+
+
 
 }
