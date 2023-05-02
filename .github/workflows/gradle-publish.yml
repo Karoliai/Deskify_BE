@@ -1,0 +1,17 @@
+build_job:
+  stage: build
+  tags:
+    - docker
+
+  script:
+    - echo "Gradle build started"
+    - "gradle build"
+
+test_job:
+  stage: test
+  tags:
+    - docker
+
+  script:
+    - echo "Gradle test started"
+    - "gradle test"
