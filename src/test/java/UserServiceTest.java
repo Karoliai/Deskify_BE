@@ -65,7 +65,7 @@ class UserServiceTest {
         assertEquals(user.getPassword(), result.getPassword());
         assertEquals(user.getFirstName(), result.getFirstName());
         assertEquals(user.getLastName(), result.getLastName());
-        assertEquals(user.getEmail() + ".com", result.getEmail());
+        assertEquals(user.getEmail(), result.getEmail());
         assertEquals(user.getAccountType(), result.getAccountType());
     }
 
