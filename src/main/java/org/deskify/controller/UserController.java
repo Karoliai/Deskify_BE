@@ -2,13 +2,12 @@ package org.deskify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.deskify.model.api.request.CreateUserRequest;
+import org.deskify.model.api.request.LoginRequest;
 import org.deskify.model.api.response.LoginResponse;
 import org.deskify.model.api.response.UserResponse;
 import org.deskify.model.domain.AccountType;
-import org.deskify.model.api.request.LoginRequest;
 import org.deskify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
